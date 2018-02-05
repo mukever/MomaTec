@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.thinkgem.jeesite.modules.sys.dao.SysParamDao">
+    
+	<sql id="sysParamColumns">
+		a.id AS "id",
+		a.param_code AS "paramCode",
+		a.param_name AS "paramName",
+		a.param_value AS "paramValue",
+		a.param_attr1 AS "paramAttr1",
+		a.param_attr2 AS "paramAttr2",
+		a.param_attr3 AS "paramAttr3",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag"
+	</sql>
+	
+	<sql id="sysParamJoins">
+	</sql>
+    
+	<select id="get" resultType="SysParam">
+		SELECT 
+			<include refid="sysParamColumns"/>
+		FROM sys_param a
+		<include refid="sysParamJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="getByParamCode" resultType="SysParam">
+		SELECT 
+			<include refid="sysParamColumns"/>
+		FROM sys_param a
+		<include refid="sysParamJoins"/>
+		WHERE a.param_code = #{paramCode}
+	</select>
+	
+	<select id="findList" resultType="SysParam">
+		SELECT 
+			<include refid="sysParamColumns"/>
+		FROM sys_param a
+		<include refid="sysParamJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="paramCode != null and paramCode != ''">
+				AND a.param_code LIKE 
+					<if test="dbName == 'oracle'">'%'||#{paramCode}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{paramCode}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{paramCode},'%')</if>
+			</if>
+			<if test="paramName != null and paramName != ''">
+				AND a.param_name LIKE 
+					<if test="dbName == 'oracle'">'%'||#{paramName}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{paramName}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{paramName},'%')</if>
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="SysParam">
+		SELECT 
+			<include refid="sysParamColumns"/>
+		FROM sys_param a
+		<include refid="sysParamJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO sys_param(
+			id,
+			param_code,
+			param_name,
+			param_value,
+			param_attr1,
+			param_attr2,
+			param_attr3,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag
+		) VALUES (
+			#{id},
+			#{paramCode},
+			#{paramName},
+			#{paramValue},
+			#{paramAttr1},
+			#{paramAttr2},
+			#{paramAttr3},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE sys_param SET 	
+			param_code = #{paramCode},
+			param_name = #{paramName},
+			param_value = #{paramValue},
+			param_attr1 = #{paramAttr1},
+			param_attr2 = #{paramAttr2},
+			param_attr3 = #{paramAttr3},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			remarks = #{remarks}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE sys_param SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

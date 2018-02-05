@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.thinkgem.jeesite.modules.face.dao.conmachine.FaceControllerDao">
+    
+	<sql id="faceControllerColumns">
+		a.id AS "id",
+		a.conmachine_id AS "conmachineId",
+		a.office_id AS "office.id",
+		a.in_date AS "inDate",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag",
+		o3.name AS "office.name"
+	</sql>
+	
+	<sql id="faceControllerJoins">
+		LEFT JOIN sys_office o3 ON o3.id = a.office_id
+	</sql>
+    
+	<select id="get" resultType="FaceController">
+		SELECT 
+			<include refid="faceControllerColumns"/>
+		FROM face_controller a
+		<include refid="faceControllerJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	
+	
+	<select id="getCon" resultType="FaceController">
+		SELECT 
+			<include refid="faceControllerColumns"/>
+		FROM face_controller a
+		<include refid="faceControllerJoins"/>
+		WHERE a.conmachine_id = #{conmachineId}
+	</select>
+	
+	<select id="findList" resultType="FaceController">
+		SELECT 
+			<include refid="faceControllerColumns"/>
+		FROM face_controller a
+		<include refid="faceControllerJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="conmachineId != null and conmachineId != ''">
+				AND a.conmachine_id = #{conmachineId}
+			</if>
+			<if test="office != null and office.id != null and office.id != ''">
+				AND a.office_id = #{office.id}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="FaceController">
+		SELECT 
+			<include refid="faceControllerColumns"/>
+		FROM face_controller a
+		<include refid="faceControllerJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO face_controller(
+			id,
+			conmachine_id,
+			office_id,
+			in_date,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag
+		) VALUES (
+			#{id},
+			#{conmachineId},
+			#{office.id},
+			#{inDate},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE face_controller SET 	
+			conmachine_id = #{conmachineId},
+			office_id = #{office.id},
+			in_date = #{inDate},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			remarks = #{remarks}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE face_controller SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

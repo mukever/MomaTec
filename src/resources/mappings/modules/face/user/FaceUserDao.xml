@@ -1,0 +1,187 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.thinkgem.jeesite.modules.face.dao.user.FaceUserDao">
+    
+	<sql id="faceUserColumns">
+		a.id AS "id",
+		a.user_id AS "userId",
+		a.no_id AS "noId",
+		a.office_id AS "office.id",
+		a.phone AS "phone",
+		a.mail AS "mail",
+		a.address AS "address",
+		a.name AS "name",
+		a.photo AS "photo",
+		a.feature AS "feature",
+		a.isnew AS "isnew",
+		a.sex AS "sex",
+		a.in_date AS "inDate",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag",
+		o4.name AS "office.name"
+	</sql>
+	
+	<sql id="faceUserJoins">
+		LEFT JOIN sys_office o4 ON o4.id = a.office_id
+	</sql>
+    
+	<select id="get" resultType="FaceUser">
+		SELECT 
+			<include refid="faceUserColumns"/>
+		FROM face_user a
+		<include refid="faceUserJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="FaceUser">
+		SELECT 
+			<include refid="faceUserColumns"/>
+		FROM face_user a
+		<include refid="faceUserJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="userId != null and userId != ''">
+				AND a.user_id LIKE 
+					<if test="dbName == 'oracle'">'%'||#{userId}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{userId}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{userId},'%')</if>
+			</if>
+			<if test="noId != null and noId != ''">
+				AND a.no_id LIKE 
+					<if test="dbName == 'oracle'">'%'||#{noId}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{noId}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{noId},'%')</if>
+			</if>
+			<if test="office != null and office.id != null and office.id != ''">
+				AND a.office_id = #{office.id}
+			</if>
+			<if test="phone != null and phone != ''">
+				AND a.phone = #{phone}
+			</if>
+			<if test="mail != null and mail != ''">
+				AND a.mail LIKE 
+					<if test="dbName == 'oracle'">'%'||#{mail}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{mail}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{mail},'%')</if>
+			</if>
+			<if test="address != null and address != ''">
+				AND a.address LIKE 
+					<if test="dbName == 'oracle'">'%'||#{address}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{address}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{address},'%')</if>
+			</if>
+			<if test="name != null and name != ''">
+				AND a.name LIKE 
+					<if test="dbName == 'oracle'">'%'||#{name}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{name}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{name},'%')</if>
+			</if>
+			<if test="isnew != null and isnew != ''">
+				AND a.isnew = #{isnew}
+			</if>
+			<if test="sex != null and sex != ''">
+				AND a.sex = #{sex}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="FaceUser">
+		SELECT 
+			<include refid="faceUserColumns"/>
+		FROM face_user a
+		<include refid="faceUserJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO face_user(
+			id,
+			user_id,
+			no_id,
+			office_id,
+			phone,
+			mail,
+			address,
+			name,
+			photo,
+			feature,
+			isnew,
+			sex,
+			in_date,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag
+		) VALUES (
+			#{id},
+			#{userId},
+			#{noId},
+			#{office.id},
+			#{phone},
+			#{mail},
+			#{address},
+			#{name},
+			#{photo},
+			#{feature},
+			#{isnew},
+			#{sex},
+			#{inDate},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE face_user SET 	
+			user_id = #{userId},
+			no_id = #{noId},
+			office_id = #{office.id},
+			phone = #{phone},
+			mail = #{mail},
+			address = #{address},
+			name = #{name},
+			photo = #{photo},
+			isnew = #{isnew},
+			sex = #{sex},
+			in_date = #{inDate},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			remarks = #{remarks}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE face_user SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

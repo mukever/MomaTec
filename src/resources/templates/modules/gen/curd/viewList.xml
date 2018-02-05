@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="utf-8"?>
+<template>
+	<name>viewList</name>
+	<filePath>jeeadminlte/WebRoot/WEB-INF/views/${lastPackageName}/${moduleName}/${subModuleName}</filePath>
+	<fileName>${className}List.jsp</fileName>
+	<content><![CDATA[
+<%@ page contentType="text/html;charset=UTF-8" %>
+<%@ include file="/WEB-INF/views/include/taglib.jsp"%>
+<html>
+<head>
+	<title>${functionNameSimple}管理</title>
+	<meta name="decorator" content="adminlte"/>
+	<script type="text/javascript">
+		$(document).ready(function() {
+			
+		});
+		function page(n,s){
+			$("#pageNo").val(n);
+			$("#pageSize").val(s);
+			$("#searchForm").submit();
+        	return false;
+        }
+	</script>
+</head>
+<body>
+	<ul class="nav nav-tabs">
+		<li class="active"><a href="${r"${ctx}"}/${urlPrefix}/">${functionNameSimple}列表</a></li>
+		<shiro:hasPermission name="${permissionPrefix}:edit"><li><a href="${r"${ctx}"}/${urlPrefix}/form">${functionNameSimple}添加</a></li></shiro:hasPermission>
+	</ul>
+	<section class="content" style="background: redl;padding: 0px">
+	<div class="row">
+		<div class="col-xs-12">
+			<div class="box box-primary">
+				<form:form id="searchForm" modelAttribute="${className}" action="${r"${ctx}"}/${urlPrefix}/" method="post" class="form-horizontal">
+					<input id="pageNo" name="pageNo" type="hidden" value="${r"${page.pageNo}"}"/>
+					<input id="pageSize" name="pageSize" type="hidden" value="${r"${page.pageSize}"}"/>
+					<div class="box-body">
+					<#list table.columnList as c>
+						<#if c.isQuery?? && c.isQuery == "1">
+						<div class="col-md-4">
+							<div class="form-group">
+								<label class="col-sm-4 control-label">${c.comments}：</label>
+								<div class="col-sm-8">
+								<#if c.showType == "input" || c.showType == "textarea">
+									<form:input path="${c.javaFieldId}" htmlEscape="false"<#if c.dataLength != "0"> maxlength="${c.dataLength}"</#if> class="form-control"/>
+								<#elseif c.showType == "select">
+									<form:select path="${c.javaFieldId}" class="form-control">
+										<form:option value="" label=""/>
+										<form:options items="${"$"}{fns:getDictList('${c.dictType}')}" itemLabel="label" itemValue="value" htmlEscape="false"/>
+									</form:select>
+								<#elseif c.showType == "checkbox">
+									<form:checkboxes path="${c.javaFieldId}" items="${"$"}{fns:getDictList('${c.dictType}')}" itemLabel="label" itemValue="value" htmlEscape="false"/>
+								<#elseif c.showType == "radiobox">
+									<form:radiobuttons path="${c.javaFieldId}" items="${"$"}{fns:getDictList('${c.dictType}')}" itemLabel="label" itemValue="value" htmlEscape="false"/>
+								<#elseif c.showType == "dateselect" && c.queryType == "between">
+									<input name="begin${c.simpleJavaField?cap_first}" type="text" readonly="readonly" maxlength="20" class="form-control Wdate"
+										value="<fmt:formatDate value="${"$"}{${className}.begin${c.simpleJavaField?cap_first}}" pattern="yyyy-MM-dd HH:mm:ss"/>"
+										onclick="WdatePicker({dateFmt:'yyyy-MM-dd HH:mm:ss',isShowClear:false});"/> - 
+									<input name="end${c.simpleJavaField?cap_first}" type="text" readonly="readonly" maxlength="20" class="form-control Wdate"
+										value="<fmt:formatDate value="${"$"}{${className}.end${c.simpleJavaField?cap_first}}" pattern="yyyy-MM-dd HH:mm:ss"/>"
+										onclick="WdatePicker({dateFmt:'yyyy-MM-dd HH:mm:ss',isShowClear:false});"/>
+								<#elseif c.showType == "dateselect">
+									<input name="${c.javaFieldId}" type="text" readonly="readonly" maxlength="20" class="form-control Wdate"
+										value="<fmt:formatDate value="${"$"}{${className}.${c.javaFieldId}}" pattern="yyyy-MM-dd HH:mm:ss"/>"
+										onclick="WdatePicker({dateFmt:'yyyy-MM-dd HH:mm:ss',isShowClear:false});"/>
+								<#elseif c.showType == "userselect">
+									<sys:treeselect id="${c.simpleJavaField}" name="${c.javaFieldId}" value="${"$"}{${className}.${c.javaFieldId}}" labelName="${c.javaFieldName}" labelValue="${"$"}{${className}.${c.javaFieldName}}"
+										title="用户" url="/sys/office/treeData?type=3" cssClass="form-control" allowClear="true" notAllowSelectParent="true"/>
+								<#elseif c.showType == "officeselect">
+									<sys:treeselect id="${c.simpleJavaField}" name="${c.javaFieldId}" value="${"$"}{${className}.${c.javaFieldId}}" labelName="${c.javaFieldName}" labelValue="${"$"}{${className}.${c.javaFieldName}}"
+										title="部门" url="/sys/office/treeData?type=2" cssClass="form-control" allowClear="true" notAllowSelectParent="true"/>
+	
+								</#if>
+								</div>
+							</div>
+						</div>
+								</#if>
+					</#list>
+						<div class="col-md-12 col-md-offset-5"><input id="btnSubmit" class="btn btn-primary" type="submit" value="查询"/></div>
+					</div>
+				</form:form>
+				<sys:message content="${r"${message}"}"/>
+				<table id="contentTable" class="table table-bordered table-striped table-hover dataTable no-footer">
+						<tr>
+							<#list table.columnList as c>
+								<#if c.isList?? && c.isList == "1">
+							<th class="text-center">${c.comments}</th>
+								</#if>
+							</#list>
+							<shiro:hasPermission name="${permissionPrefix}:edit"><th>操作</th></shiro:hasPermission>
+						</tr>
+					<c:forEach items="${r"${page.list}"}" var="${className}">
+						<tr>
+							<#assign firstListField = true>
+							<#list table.columnList as c>
+								<#if c.isList?? && c.isList == "1">
+							<td class="text-center"><#if firstListField><a href="${r"${ctx}"}/${urlPrefix}/form?id=${"${"+className+".id}"}"></#if>
+							<#if c.simpleJavaType == "Date">
+								<fmt:formatDate value="${"$"}{${className}.${c.javaFieldId}}" pattern="yyyy-MM-dd HH:mm:ss"/>
+							<#elseif c.showType == "select" || c.showType == "checkbox" || c.showType == "radiobox">
+								${"$"}{fns:getDictLabel(${className}.${c.javaFieldId}, '${c.dictType}', '')}
+							<#else>
+								${"$"}{${className}.${c.javaFieldId}}
+							</#if>
+							<#if firstListField></a></#if></td>
+									<#assign firstListField = false>
+								</#if>
+							</#list>
+							<shiro:hasPermission name="${permissionPrefix}:edit"><td>
+			    				<a href="${r"${ctx}"}/${urlPrefix}/form?id=${"${"+className+".id}"}" class="btn btn-success btn-sm"><span class=""><i class="fa fa-pencil">&nbsp;修改</i></span></a>
+								<a href="${r"${ctx}"}/${urlPrefix}/delete?id=${"${"+className+".id}"}" onclick="return confirmx('确认要删除该${functionNameSimple}吗？', this.href)" class="btn btn-warning btn-sm"><i class="fa fa-trash">&nbsp;删除</i></a>
+							</td></shiro:hasPermission>
+						</tr>
+					</c:forEach>
+				</table>
+					${r"${page}"}					 
+				</div>
+			</div>
+		</div>
+	</section>
+</body>
+</html>]]>
+	</content>
+</template>

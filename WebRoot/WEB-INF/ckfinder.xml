@@ -1,0 +1,106 @@
+<config>
+	<!--true表示开启ckfinder功能。默认是false -->
+	<enabled>true</enabled>
+	<!-- 上传文件存放的路径 -->
+	<baseDir></baseDir>
+	<!--上传文件存放的URL  -->
+	<baseURL>/userfiles/</baseURL>
+	<!--授权密钥  -->
+	<licenseKey></licenseKey>
+	<licenseName></licenseName>
+	<!-- 指定图片的上传大小，如果图片比设置范围大时，将会按指定的大小加载 -->
+	<imgWidth>1024</imgWidth>
+	<imgHeight>768</imgHeight>
+	<imgQuality>80</imgQuality>
+	<!--编码 -->
+	<uriEncoding>UTF-8</uriEncoding>
+	<forceASCII>false</forceASCII>
+	<!-- 设置为false。如果设置为true，在创建文件夹或者上传文件时，名字里不能包含不安全的字符。这只在IIS里生效 -->
+    <disallowUnsafeCharacters>false</disallowUnsafeCharacters>
+    <!-- session中的用户权限变量 -->
+	<userRoleSessionVar>CKFinder_UserRole</userRoleSessionVar>
+	<!--检查多级扩展名，或许你禁止用户上传php文件，允许用户上传rar文件。如果此项设置为false，文件foo.php.rar就会上传到服务器，这不安全。因此此项设置为true  -->
+	<checkDoubleExtension>true</checkDoubleExtension>
+	<!-- 在缩放后检查大小 -->
+	<checkSizeAfterScaling>true</checkSizeAfterScaling>
+	<!-- 设置此项为true，可以检查文件到底是不是图片，很有可能有人把一个可执行文件加了后缀变成了.jpg，但实际上它不是一个图片文件 -->
+	<secureImageUploads>true</secureImageUploads>
+	<!-- 允许上传的文件中包含html代码的文件类型 -->
+	<htmlExtensions>html,htm,xml,js</htmlExtensions>
+	<!-- 对用户隐藏文件夹，可以使用*和？，分别代表多个和一个类型 -->
+	<hideFolders>
+		<folder>.*</folder>
+		<folder>CVS</folder>
+	</hideFolders>
+	<!-- 对用户隐藏文件 -->
+	<hideFiles>
+		<file>.*</file>
+	</hideFiles>
+	<defaultResourceTypes></defaultResourceTypes>
+	<!-- 配置路径以及格式 -->
+	<types>
+		<type name="files">
+			<url>%BASE_URL%files/</url>
+			<directory>%BASE_DIR%files</directory>
+			<maxSize>5M</maxSize>
+			<allowedExtensions>7z,aiff,asf,avi,bmp,csv,doc,docx,fla,flv,gif,gz,gzip,jpeg,jpg,mid,mov,mp3,mp4,mpc,mpeg,mpg,ods,odt,pdf,png,ppt,pptx,pxd,qt,ram,rar,rm,rmi,rmvb,rtf,sdc,sitd,swf,sxc,sxw,tar,tgz,tif,tiff,txt,vsd,wav,wma,wmv,xls,xlsx,zip</allowedExtensions>
+			<deniedExtensions></deniedExtensions>
+		</type>
+		<type name="images">
+			<url>%BASE_URL%images/</url>
+			<directory>%BASE_DIR%images</directory>
+			<maxSize>2M</maxSize>
+			<allowedExtensions>bmp,gif,jpeg,jpg,png</allowedExtensions>
+			<deniedExtensions></deniedExtensions>
+		</type>
+		<type name="flash">
+			<url>%BASE_URL%flash/</url>
+			<directory>%BASE_DIR%flash</directory>
+			<maxSize>2M</maxSize>
+			<allowedExtensions>swf,flv</allowedExtensions>
+			<deniedExtensions></deniedExtensions>
+		</type>
+	</types>
+	<accessControls>
+		<accessControl>
+			<role>*</role><!-- 设置用户类型 -->
+			<resourceType>*</resourceType><!-- 不同资源如images,flash,files -->
+			<folder>/</folder><!-- 默认“/”是没有文件夹设置 -->
+			<folderView>false</folderView><!-- true生效false失效 -->
+			<folderCreate>false</folderCreate>
+			<folderRename>false</folderRename>
+			<folderDelete>false</folderDelete>
+			<fileView>false</fileView>
+			<fileUpload>false</fileUpload>
+			<fileRename>false</fileRename>
+			<fileDelete>false</fileDelete>
+		</accessControl>
+	</accessControls>
+	<thumbs>
+		<enabled>true</enabled>
+		<url>%BASE_URL%_thumbs/</url>
+		<directory>%BASE_DIR%_thumbs</directory>
+		<directAccess>true</directAccess><!-- 设置为true，直接从_thumbs文件夹中加载缩略图，其他目录下时不能使用 -->
+		<maxWidth>320</maxWidth>
+		<maxHeight>240</maxHeight>
+		<quality>80</quality>
+	</thumbs>
+	<!-- 图片浏览——图片缩略图 -->
+	<plugins>
+		<plugin>
+			<name>imageresize</name>
+			<class>com.ckfinder.connector.plugins.ImageResize</class>
+			<params>
+				<param name="smallThumb" value="90x90"></param>
+				<param name="mediumThumb" value="120x120"></param>
+				<param name="largeThumb" value="180x180"></param>
+			</params>
+		</plugin>
+		<plugin>
+			<name>fileeditor</name>
+			<class>com.ckfinder.connector.plugins.FileEditor</class>
+			<params></params>
+		</plugin>
+	</plugins>
+	<basePathBuilderImpl>com.ckfinder.connector.configuration.ConfigurationPathBuilder</basePathBuilderImpl>
+</config>
